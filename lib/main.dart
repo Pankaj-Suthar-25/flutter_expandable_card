@@ -46,6 +46,11 @@ class HomeScreen extends StatelessWidget {
               onPressed: () => _navigateTo(context, const CardLayoutScreen()),
               child: const Text('Card Layout'),
             ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _navigateTo(context, const InteractiveLayoutScreen()),
+              child: const Text('Interactive Layout')
+            ),
           ],
         ),
       ),
@@ -77,6 +82,49 @@ class CardLayoutScreen extends StatelessWidget {
         title: const Text('Card Layout'),
       ),
       body: const Center(child: ExpandedRowFlexLayoutVariant()),
+    );
+  }
+}
+
+class InteractiveLayoutScreen extends StatelessWidget {
+  const InteractiveLayoutScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Interactive Layout')
+      ),
+      body: const Center(child: InteractiveFlexPanelsLayout()),
+    );
+  }
+}
+
+class ExpandedRowFlexLayout extends StatelessWidget {
+  const ExpandedRowFlexLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _buildExpandedContainer(Colors.red, '2/5', 2),
+        _buildExpandedContainer(Colors.blue, '1/5', 1),
+        _buildExpandedContainer(Colors.green, '2/5', 2),
+      ],
+    );
+  }
+
+  Expanded _buildExpandedContainer(Color color, String text, int flex) {
+    return Expanded(
+      flex: flex,
+      child: Container(
+        color: color,
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
     );
   }
 }
@@ -199,29 +247,136 @@ class _ExpandedCardState extends State<ExpandedCard>
   }
 }
 
-class ExpandedRowFlexLayout extends StatelessWidget {
-  const ExpandedRowFlexLayout({super.key});
+class InteractiveFlexPanelsLayout extends StatefulWidget {
+  const InteractiveFlexPanelsLayout({super.key});
+
+  @override
+  State<InteractiveFlexPanelsLayout> createState() => _InteractiveFlexPanelsLayout();
+}
+
+class _InteractiveFlexPanelsLayout extends State<InteractiveFlexPanelsLayout> with TickerProviderStateMixin {
+  int? selectedIndex;
+  static const int totalFlex = 5;
+  static const List<int> baseFlexes = [2, 1, 2];
+  static const int expandedFlex = 4;
+  static const int shrunkFlex = 1;
+
+  void onPanelTap(int index) {
+    setState(() {
+      if (selectedIndex == index) {
+        selectedIndex = null;
+      } else {
+        selectedIndex = index;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: [
-        _buildExpandedContainer(Colors.red, '2/5', 2),
-        _buildExpandedContainer(Colors.blue, '1/5', 1),
-        _buildExpandedContainer(Colors.green, '2/5', 2),
-      ],
+      children: List.generate(3, (index) {
+        final bool isSelected = selectedIndex == index;
+        final int flex = selectedIndex == null
+            ? baseFlexes[index] : (isSelected ? expandedFlex : shrunkFlex);
+
+        return Expanded(
+          flex: flex,
+          child: AnimatedFlexPanel(
+            key: ValueKey(index),
+            flex: flex,
+            colorStart: _gradientColors[index][0],
+            colorEnd: _gradientColors[index][1],
+            icon: _icons[index],
+            label: _labels[index],
+            isSelected: isSelected,
+            onTap: () => onPanelTap(index),
+          ),
+        );
+      }),
     );
   }
+}
 
-  Expanded _buildExpandedContainer(Color color, String text, int flex) {
-    return Expanded(
-      flex: flex,
-      child: Container(
-        color: color,
-        alignment: Alignment.center,
-        child: Text(
-          text,
-          style: TextStyle(color: Colors.white),
+const List<List<Color>> _gradientColors = [
+  [Color(0xFFff416c), Color(0xFFff4b2b)],
+  [Color(0xFF1e3c72), Color(0xFF2a5298)],
+  [Color(0xFF11998e), Color(0xFF38ef7d)],
+];
+
+const List<IconData> _icons = [
+  Icons.favorite,
+  Icons.lightbulb,
+  Icons.nature,
+];
+
+const List<String> _labels = [
+  'Love 2/5',
+  'Idea 1/5',
+  'Nature 2/5'
+];
+
+class AnimatedFlexPanel extends StatelessWidget {
+  final int flex;
+  final Color colorStart;
+  final Color colorEnd;
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const AnimatedFlexPanel({
+    super.key, required this.flex, required this.colorStart, required this.colorEnd , required this.icon, required this.label,
+      required this.isSelected, required this.onTap,});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
+      margin: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [colorStart, colorEnd],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        // ignore: deprecated_member_use
+        boxShadow: isSelected ? [BoxShadow(color: colorEnd.withOpacity(0.6),blurRadius: 15, offset: const Offset(0,8),)] : [],
+      ),
+    width: double.infinity,
+      height: double.infinity,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: onTap,
+          child: Flex(
+            direction: Axis.vertical,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: isSelected ? 60: 40, color: Colors.white),
+              const SizedBox(height: 10),
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isSelected ? 26 : 20,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.1,
+                ),
+              ),
+              if (isSelected)
+                Padding(
+                padding: const EdgeInsets.only(top: 15),
+      child: Text('Tap again to reset',
+      // ignore: deprecated_member_use
+      style: TextStyle(color: Colors.white.withOpacity(0.75),fontSize: 14,
+      fontStyle: FontStyle.italic,)),
+                )
+
+            ],
+          ),
         ),
       ),
     );
