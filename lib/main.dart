@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+     return MaterialApp(
       title: 'Flutter Expandable Card',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -18,12 +18,37 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: Text('Flutter Expandable Card'),
         ),
-        body: const Center(
-          child: Text(
-            'Welcome to Flutter Expandable Card!',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 24),
-          ),
+        body: Center(
+          child: ExpandedRowFlexLayout(),
+        ),
+      ),
+    );
+  }
+}
+
+class ExpandedRowFlexLayout extends StatelessWidget {
+  const ExpandedRowFlexLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _buildExpandedContainer(Colors.red, '2/5', 2),
+        _buildExpandedContainer(Colors.blue, '1/5', 1),
+        _buildExpandedContainer(Colors.green, '2/5', 2),
+      ],
+    );
+  }
+
+  Expanded _buildExpandedContainer(Color color, String text, int flex) {
+    return Expanded(
+      flex: flex,
+      child: Container(
+        color: color,
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          style: TextStyle(color: Colors.white),
         ),
       ),
     );
