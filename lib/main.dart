@@ -15,14 +15,68 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Flutter Expandable Card'),
-        ),
-        body: Center(
-          child: ExpandedRowFlexLayoutVariant(),
+      home: HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => screen),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Select Layout Variant')),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: () => _navigateTo(context, const SimpleLayoutScreen()),
+              child: const Text('Simple Layout'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _navigateTo(context, const CardLayoutScreen()),
+              child: const Text('Card Layout'),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class SimpleLayoutScreen extends StatelessWidget {
+  const SimpleLayoutScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Simple Layout'),
+      ),
+      body: const Center(child: ExpandedRowFlexLayout()),
+    );
+  }
+}
+
+class CardLayoutScreen extends StatelessWidget {
+  const CardLayoutScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Card Layout'),
+      ),
+      body: const Center(child: ExpandedRowFlexLayoutVariant()),
     );
   }
 }
